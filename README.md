@@ -1,2 +1,2 @@
 # C
-This repository stores my works that I have written in the C language.
+This repository stores my works that I have written in the C/C++ language.
