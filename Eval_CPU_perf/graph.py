@@ -1,16 +1,17 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 # Установка стиля графиков
 plt.style.use('seaborn-v0_8-darkgrid')
 
 # Чтение данных из CSV файла
-data = pd.read_csv('/home/nazyva/gitOK/C/Eval_CPU_perf/benchmark_results.csv', header=None)
+data = pd.read_csv('/home/pin-service/projects/labs/C/Eval_CPU_perf/benchmark_results.csv', header=None)
 
 # Задаем названия столбцов для удобства
 data.columns = [
     'Processor', 'Task', 'Type', 'Optimization', 'InsCount', 
-    'TimingMethod', 'MatSaize', 'Trials', 'AvgTime', 'StdDev', 'StdDevPercent', 'Performance'
+    'TimingMethod', 'MatSize', 'Trials', 'AvgTime', 'StdDev', 'StdDevPercent', 'Performance'
 ]
 
 # Преобразование столбца AvgTime в числовой формат
@@ -46,3 +47,32 @@ mean_performance = performance_summary.mean().mean()  # Средняя прои�
 
 # Печать результата
 print(f'Средняя производительность для равновероятного использования типовых задач: {mean_performance:.2f} инструкций в секунду')
+
+# Построение сравнительных графиков по значениям оптимизации и типам, если значений больше одного
+if data['Optimization'].nunique() > 1:
+    tasks = data['Task'].unique()  # Получаем список задач
+    
+    for task in tasks:
+        task_data = data[data['Task'] == task]  # Фильтруем данные для каждой задачи
+        
+        # Построение графика только если в задаче несколько значений Optimization
+        if task_data['Optimization'].nunique() > 1:
+            plt.figure(figsize=(12, 7))
+            
+            # Построение столбчатого графика с помощью seaborn
+            sns.barplot(
+                data=task_data, x='Optimization', y='AvgTime', hue='Type', 
+                palette='viridis', edgecolor='black'
+            )
+
+            # Настройка графика
+            plt.title(f'Среднее время выполнения для {task} по оптимизациям и типам данных', fontsize=16)
+            plt.xlabel('Оптимизация', fontsize=14)
+            plt.ylabel('Среднее время выполнения (сек)', fontsize=14)
+            plt.xticks(rotation=45)
+            plt.legend(title='Тип данных')
+            plt.grid(axis='y', linestyle='--', alpha=0.7)
+
+            plt.tight_layout()
+            plt.savefig(f'comparison_{task}.png')  # Сохранение графика с именем задачи
+            plt.clf()  # Очистка графика для следующего
