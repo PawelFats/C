@@ -122,36 +122,6 @@ double writeToRAM(char* dest, const char* src, size_t dataSize) {
 
     return duration.tv_sec + (duration.tv_nsec / 1000000000.0);
 }
-// double writeToRAM(char* data, size_t dataSize) {
-//     // Предварительная генерация случайных данных
-//     char* randomData = new char[dataSize];
-//     for (size_t i = 0; i < dataSize; ++i) {
-//         randomData[i] = rand() % 256; // Генерируем случайные данные
-//     }
-
-//     timespec start, end;
-//     clock_gettime(CLOCK_MONOTONIC, &start);
-
-//     // Записываем случайные данные в массив
-//     for (size_t i = 0; i < dataSize; ++i) {
-//         data[i] = randomData[i];
-//     }
-
-//     clock_gettime(CLOCK_MONOTONIC, &end);
-
-//     // Освобождаем память, выделенную под случайные данные
-//     delete[] randomData;
-
-//     timespec duration;
-//     duration.tv_sec = end.tv_sec - start.tv_sec;
-//     duration.tv_nsec = end.tv_nsec - start.tv_nsec;
-//     if (duration.tv_nsec < 0) {
-//         duration.tv_sec -= 1;
-//         duration.tv_nsec += 1000000000;
-//     }
-
-//     return duration.tv_sec + (duration.tv_nsec / 1000000000.0);
-// }
 
 // Функция для чтения с RAM
 double readFromRAM(char* dest, size_t dataSize) {
@@ -167,30 +137,6 @@ double readFromRAM(char* dest, size_t dataSize) {
     timespec duration = diff(start, end);
     return duration.tv_sec + (duration.tv_nsec / 1000000000.0);
 }
-// Функция для чтения с RAM
-// double readFromRAM(const char* data, size_t dataSize) {
-//     timespec start, end;
-//     clock_gettime(CLOCK_MONOTONIC, &start);
-
-//     for (size_t i = 0; i < dataSize; ++i) {
-//         volatile char tmp = data[i]; // Читаем данные
-//         (void)tmp;
-//     }
-
-//     clock_gettime(CLOCK_MONOTONIC, &end);
-
-//     // Вычисляем разницу времени
-//     timespec duration;
-//     duration.tv_sec = end.tv_sec - start.tv_sec;
-//     duration.tv_nsec = end.tv_nsec - start.tv_nsec;
-//     if (duration.tv_nsec < 0) {
-//         duration.tv_sec -= 1;
-//         duration.tv_nsec += 1000000000;
-//     }
-
-//     return duration.tv_sec + (duration.tv_nsec / 1000000000.0);
-// }
-
 
 void saveResultToCSV(const string& filePath, const TestResult& result) {
     ofstream outFile(filePath, ios::app);
@@ -218,7 +164,7 @@ TestResult runTest(MemoryType memType, size_t blockSize, int numTests, const str
     vector<char> buffer(blockSize);
     char* data = new char[blockSize];
     TestResult result;
-    result.memoryType = (memType == RAM) ? "RAM" : "HDD";
+    result.memoryType = (memType == RAM) ? "RAM" : "SSD";
     result.blockSize = blockSize;
     result.elementType = "char"; // Тип элементов - char
     result.bufferSize = blockSize;
@@ -237,7 +183,7 @@ TestResult runTest(MemoryType memType, size_t blockSize, int numTests, const str
 
         if (memType == RAM) {
             // Копируем заранее подготовленные случайные данные в buffer
-            std::copy(randomData.begin(), randomData.end(), buffer.begin());
+            //std::copy(randomData.begin(), randomData.end(), buffer.begin());
 
             // Записываем данные в память и считаем время
             writeTime = writeToRAM(buffer.data(), randomData.data(), blockSize);
@@ -294,7 +240,7 @@ int main(int argc, char* argv[]) {
             if (strcmp(argv[i + 1], "RAM") == 0) {
                 memType = RAM;
             } else if (strcmp(argv[i + 1], "HDD") == 0 || strcmp(argv[i + 1], "SSD") == 0 || strcmp(argv[i + 1], "flash") == 0) {
-                memType = HDD;
+                memType = SSD;
                 filePath = "test_file_" + string(argv[i + 1]) + ".dat"; // Файл для записи на диск
             }
         } else if (strcmp(argv[i], "--block-size") == 0) {

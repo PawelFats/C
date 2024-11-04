@@ -17,7 +17,7 @@ headers = [
 # Добавляем заголовки
 data.columns = headers
 
-data['blockSize'] = data['blockSize'] / 1024
+data['blockSize'] = data['blockSize'] / 1024 / 1024
 
 # 1. Зависимость пропускной способности записи и чтения от размера блока данных
 def plot_bandwidth_vs_blocksize(data):
